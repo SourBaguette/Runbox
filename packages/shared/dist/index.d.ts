@@ -20,7 +20,7 @@ export declare const SubmissionSchema: z.ZodObject<{
     code: z.ZodString;
     stdin: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
-export type SubmissionSchema = z.infer<typeof SubmissionSchema>;
+export type Submission = z.infer<typeof SubmissionSchema>;
 export declare const JobStatus: z.ZodEnum<{
     pending: "pending";
     running: "running";

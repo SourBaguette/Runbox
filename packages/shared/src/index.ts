@@ -7,10 +7,10 @@ export type Language = z.infer<typeof Language>;
 
 export const SubmissionSchema = z.object({
     language: Language,
-    code: z.string().min(1).max(50_0000),
+    code: z.string().min(1).max(50_000),
     stdin: z.string().max(10_000).optional(),
 });
-export type SubmissionSchema = z.infer<typeof SubmissionSchema>;
+export type Submission = z.infer<typeof SubmissionSchema>;
 
 export const JobStatus = z.enum([
     'pending',       // in queue, not yet picked up
