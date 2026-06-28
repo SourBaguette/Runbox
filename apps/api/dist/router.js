@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.appRouter = void 0;
 const server_1 = require("@trpc/server");
-const zod_1 = __importDefault(require("zod"));
+const zod_1 = require("zod");
 const uuid_1 = require("uuid");
 const shared_1 = require("@runbox/shared");
 const queue_1 = require("./queue");
@@ -18,14 +15,23 @@ exports.appRouter = t.router({
         const jobId = (0, uuid_1.v4)();
         const createdAt = new Date().toISOString();
         // Store pending
-        await (0, redis_1.setResult)(jobId, input);
+        await (0, redis_1.setResult)(jobId, {
+            jobId,
+            language: input.language,
+            status: 'pending',
+            stdout: '',
+            stderr: '',
+            exitCode: -1,
+            executionTimeMs: 0,
+            createdAt,
+        });
         // Enqueue
-        queue_1.executionQueue.add('execute', { jobId, submission: input, createdAt }, { jobId });
+        await queue_1.executionQueue.add('execute', { jobId, submission: input, createdAt }, { jobId });
         // return jobId, status 'pending' as const
         return { jobId, status: 'pending' };
     }),
     result: t.procedure
-        .input(zod_1.default.object({ jobId: zod_1.default.uuid() }))
+        .input(zod_1.z.object({ jobId: zod_1.z.uuid() }))
         .query(async ({ input }) => {
         const result = await (0, redis_1.getResult)(input.jobId);
         if (!result) {
